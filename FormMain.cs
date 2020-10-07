@@ -28,7 +28,7 @@ namespace CookbookDatabase
         private void FormMain_Load(object sender, EventArgs e)
         {
             PopulateRecipes();
-            
+            PopulateAllIngredients();
         }
 
         private void PopulateRecipes()
@@ -44,6 +44,21 @@ namespace CookbookDatabase
                 lstRecipes.DataSource = recipeTable;
             }
             
+        }
+
+        private void PopulateAllIngredients()
+        {
+            using (connection = new SqlConnection(connectionString))
+            using (SqlDataAdapter adapter = new SqlDataAdapter("SELECT * FROM Ingridient", connection))
+            {
+                DataTable ingridientTable = new DataTable();
+                adapter.Fill(ingridientTable);
+
+                lstAllIngredients.DisplayMember = "Name";
+                lstAllIngredients.ValueMember = "Id";
+                lstAllIngredients.DataSource = ingridientTable;
+            }
+
         }
 
         private void PopulateIngrideints()
@@ -71,6 +86,53 @@ namespace CookbookDatabase
         private void lstRecipes_SelectedIndexChanged(object sender, EventArgs e)
         {
             PopulateIngrideints();
+        }
+
+        private void btnAddRecipe_Click(object sender, EventArgs e)
+        {
+            string query = "INSERT INTO Recipe VALUES (@RecipeName, 80, 'Another fucking salad!')";
+
+            using (connection = new SqlConnection(connectionString))
+            using (SqlCommand command = new SqlCommand(query, connection))
+            {
+                connection.Open();
+                command.Parameters.AddWithValue("@RecipeName", txtRecipeName.Text);
+                command.ExecuteNonQuery();
+            }
+
+            PopulateRecipes();
+        }
+
+        private void btnUpdateRecipeName_Click(object sender, EventArgs e)
+        {
+            string query = "UPDATE Recipe SET Name = @RecipeName WHERE Id = @RecipeID";
+
+            using (connection = new SqlConnection(connectionString))
+            using (SqlCommand command = new SqlCommand(query, connection))
+            {
+                connection.Open();
+                command.Parameters.AddWithValue("@RecipeName", txtRecipeName.Text);
+                command.Parameters.AddWithValue("@RecipeID", lstRecipes.SelectedValue);
+                command.ExecuteNonQuery();
+            }
+
+            PopulateRecipes();
+        }
+
+        private void btnAddToRecipe_Click(object sender, EventArgs e)
+        {
+            string query = "INSERT INTO RecipeIngeredient VALUES (@RecipeID, @IngredientID)";
+
+            using (connection = new SqlConnection(connectionString))
+            using (SqlCommand command = new SqlCommand(query, connection))
+            {
+                connection.Open();
+                command.Parameters.AddWithValue("@RecipeID", lstRecipes.SelectedValue);
+                command.Parameters.AddWithValue("@IngredientID", lstAllIngredients.SelectedValue);
+                command.ExecuteNonQuery();
+            }
+
+            PopulateRecipes();
         }
     }
 }
