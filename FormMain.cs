@@ -7,28 +7,32 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Configuration;
+using System.Data.SqlClient;
 
 namespace CookbookDatabase
 {
     public partial class FormMain : Form
     {
+        string connectionString;
+
         public FormMain()
         {
             InitializeComponent();
+            connectionString = ConfigurationManager
+                .ConnectionStrings["CookbookDatabase.Properties.Settings.CookbookConnectionString"]
+                .ConnectionString;
         }
 
         private void FormMain_Load(object sender, EventArgs e)
         {
-            // TODO: This line of code loads data into the 'cookbookDataSet.Ingridient' table. You can move, or remove it, as needed.
-            this.ingridientTableAdapter.Fill(this.cookbookDataSet.Ingridient);
+            
 
         }
 
         private void ingridientBindingNavigatorSaveItem_Click(object sender, EventArgs e)
         {
-            this.Validate();
-            this.ingridientBindingSource.EndEdit();
-            this.tableAdapterManager.UpdateAll(this.cookbookDataSet);
+            
 
         }
     }
